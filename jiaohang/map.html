@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-default/index.css">
+		<script src="https://unpkg.com/vue"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<script src="//cdn1.lncld.net/static/js/3.0.2/av-min.js"></script>
+		<script src="js/function.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div id="app">
+			<el-table
+			    :data="tableData"
+			    border
+			    style="width: 100%">
+			    <el-table-column
+			      prop="createdAt"
+			      label="日期"
+			      width="180">
+			    </el-table-column>
+			    <el-table-column
+			      prop="point"
+			      label="坐标"
+			      width="180">
+			    </el-table-column>
+			    <el-table-column
+			      prop="address"
+			      label="地址">
+			    </el-table-column>
+			</el-table>
+			  
+			<el-pagination
+			      @size-change="handleSizeChange"
+			      @current-change="handleCurrentChange"
+			      :current-page.sync="currentPage"
+			      :page-size="pageSize"
+			      layout="prev, pager, next, jumper"
+			      :total="total">
+			</el-pagination>
+			  
+		</div>
+	
+	<script>
+		var app = new Vue({
+			el: '#app',
+			data:{
+				currentPage: 1,
+				pageSize : 20,
+				total: 0,
+				tableData: [],
+				
+			},
+			methods: {
+		      	handleSizeChange(val) {
+		        	console.log(`每页 ${val} 条`);
+		      	},
+		      	handleCurrentChange(val) {
+		        	console.log(`当前页: ${val}`);
+		      	}
+		    },
+		});
+		var query = new AV.Query('Map');
+		query.equalTo('activeName', 'jiaohang');
+		//总量
+		query.count().then(function (count) {
+		    app.total = count;
+		}, function (error) {});
+		
+		query.find().then(function(results) {
+			var tempArr = new Array();
+			results.forEach(function(item){
+				var temp = new Object();
+				temp.point = item.get('point');
+				temp.createdAt = item.get('createdAt').Format('yyyy-MM-dd hh:mm:ss');
+				temp.address = item.get('address');
+				tempArr.push(temp);
+			});
+			app.tableData = tempArr;
+		}, function(error) {});
+		
+		
+		
+	</script>
+	</body>
+</html>

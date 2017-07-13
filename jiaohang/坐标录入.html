@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+		<script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+
+	</head>
+
+	<body>
+		<div ng-app="myApp" ng-controller="rankCtrl" class="wrap">
+
+			<div class="form-group" style="width: 200px;">
+				<label for="inp-phoneNum">请输入手机号</label>
+				<input type="tel" ng-model="phoneNum" ng-change="search()" class="form-control" id="inp-phoneNum">
+			</div>
+
+			<table class="table table-striped table-bordered table-hover">
+				<tr>
+					<th>昵称</th>
+					<th>手机</th>
+					<th>时间</th>
+					<th>分数</th>
+				</tr>
+				<tr ng-repeat="x in rankData">
+					<td>{{x.nickName}}</td>
+					<td>{{x.phoneNum}}</td>
+					<td>{{x.time | subTime}}</td>
+					<td>{{x.score}}</td>
+				</tr>
+			</table>
+
+			<button class="btn btn-default" ng-disabled="page<=1" ng-click="prev()">上一页</button>
+
+			<button class="btn btn-default" ng-disabled="page>=lastPage" ng-click="next()">下一页</button>
+
+		</div>
+
+		<a href="http://lbs.qq.com/tool/getpoint/" target="_blank">
+			坐标拾取器
+		</a>
+
+		<script src="//cdn1.lncld.net/static/js/3.0.2/av-min.js"></script>
+		<script type="text/javascript">
+			//传文件
+			const appId = 'G6wculYbfr0PoDxdg3kpiR63-gzGzoHsz';
+			const appKey = 'OEk9gcdYlvAx3MbwvKHfmFMM';
+			AV.init({
+				appId,
+				appKey
+			});
+
+			var app = angular.module('myApp', []);
+
+			app.filter('subTime', function() { //可以注入依赖
+				return function(text) {
+					return text.substring(0, 10);
+				}
+			});
+
+			app.controller('rankCtrl', function($scope, $http) {
+				$scope.page = 1;
+				$scope.lastPage = 999;
+				$scope.pageSize = 10;
+				
+				var query = new AV.Query('Map');
+				query.equalTo('activeName', 'jiaohang');
+				query.find().then(function(response) {
+					//0）数据渲染
+					$scope.rankData = response;
+
+					//3)完成分页
+					allData = response;
+					showData();
+					//向上取整得到最大页数
+					$scope.lastPage = Math.ceil(response.length / $scope.pageSize);
+
+					//5)完成搜索
+					saveData = response;
+				}, function(error) {});
+
+
+				var allData = [];
+
+
+				$scope.prev = function() {
+					$scope.page--;
+					showData();
+				}
+				$scope.next = function() {
+					$scope.page++;
+					showData();
+				}
+
+				function showData() {
+					var startIndex = ($scope.page - 1) * $scope.pageSize;
+					$scope.rankData = allData.slice(startIndex, startIndex + $scope.pageSize);
+				}
+
+				//搜索
+				var saveData = [];
+				$scope.phoneNum = "";
+				$scope.search = function() {
+					console.log($scope.phoneNum);
+					$scope.page = 1;
+					if($scope.phoneNum == "") {
+						allData = saveData; //恢复原始数据
+					} else {
+						allData = saveData.searchByPhoneNum($scope.phoneNum); //搜索数据
+					}
+					showData();
+				}
+			});
+
+			// 声明类型
+			var Map = AV.Object.extend('Map');
+			// 新建对象
+			var map = new Map();
+			map.set('activeName', 'jiaohang');
+			map.set('point', '28.113323,113.034725');
+			map.set('address', '湖南省长沙市雨花区湘府东路');
+			//			map.save().then(function(todo) {
+			//				console.log('objectId is ' + todo.id);
+			//			}, function(error) {
+			//				console.error(error);
+			//			});
+		</script>
+
+	</body>
+
+</html>
