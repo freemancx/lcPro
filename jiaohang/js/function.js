@@ -19,3 +19,34 @@ AV.init({
 	appId,
 	appKey
 });
+
+
+const rules = {
+      name: [
+        { required: true, message: '请输入活动名称', trigger: 'blur' }
+      ],
+      type: [
+        { required: true, message: '请选择类型', trigger: 'change' }
+      ],
+      point: [
+        {  required: true, message: '请输入坐标', trigger: 'blur' }
+      ],
+      cardName: [
+        {  required: true, message: '请输入优惠券名称', trigger: 'blur' }
+      ],
+      address: [
+        { required: true, message: '请输入店铺地址', trigger: 'blur' }
+      ]
+}
+Vue.prototype.rules= rules;
+
+function deepCopy(obj){
+    if(typeof obj != 'object'){
+        return obj;
+    }
+    var newobj = {};
+    for ( var attr in obj) {
+        newobj[attr] = deepCopy(obj[attr]);
+    }
+    return newobj;
+}
