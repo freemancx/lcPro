@@ -1,3 +1,6 @@
 .el-pagination{
 	text-align: center;
 }
+.el-table .cell img{
+	width: 100%;
+}
