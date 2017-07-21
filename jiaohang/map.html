@@ -85,6 +85,8 @@
 						<input type="file" id="up-load" />
 					</el-button>
 					
+					<img :src="ruleForm.logo" width="120"/>
+					
 				</el-form-item>
 				
 				<el-form-item label-width="100px">
@@ -103,6 +105,7 @@
 			var mapSaver = new MapSaver();
 			
 			var app = new Vue({
+				preview: '',
 				el: '#app',
 				data: {
 					btnLoading: false,
@@ -146,6 +149,7 @@
 								mapSaver.set('type',app.ruleForm.type);
 								mapSaver.set('cardName',app.ruleForm.cardName);
 								mapSaver.set('address',app.ruleForm.address);
+								mapSaver.set('logo',app.ruleForm.logo);
 								mapSaver.set('activeName',"jiaohang");
 								mapSaver.save().then(function (todo) {
 								    app.ruleForm.createdAt = "刚才";
