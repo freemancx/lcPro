@@ -36,7 +36,10 @@ const rules = {
       ],
       address: [
         { required: true, message: '请输入店铺地址', trigger: 'blur' }
-      ]
+      ],
+      logo: [
+        { required: true, message: '请上传店铺logo', trigger: 'blur' }
+      ],
 }
 Vue.prototype.rules= rules;
 
