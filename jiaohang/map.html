@@ -33,7 +33,10 @@
 
 				<el-table-column prop="point" label="坐标" width="180">
 				</el-table-column>
-
+				
+				<el-table-column prop="tel" label="地址">
+				</el-table-column>
+				
 				<el-table-column prop="address" label="地址">
 				</el-table-column>
 
@@ -63,8 +66,8 @@
 					</el-select>
 				</el-form-item>
 				<el-form-item label="店铺坐标" prop="point">
-					<el-input v-model="ruleForm.point" style="width: 170px;display: inline-block;"></el-input>
-					<a href="http://lbs.qq.com/tool/getpoint/" target="_blank">
+					<el-input v-model="ruleForm.point" placeholder="高德坐标系统" style="width: 170px;display: inline-block;"></el-input>
+					<a href="http://lbs.amap.com/console/show/picker" target="_blank">
 						<el-button type="primary" icon="search">
 							坐标拾取器
 						</el-button>
@@ -73,6 +76,9 @@
 
 				<el-form-item label="优惠券名称" prop="cardName">
 					<el-input v-model="ruleForm.cardName"></el-input>
+				</el-form-item>
+				<el-form-item label="店铺电话" prop="tel">
+					<el-input v-model="ruleForm.tel"></el-input>
 				</el-form-item>
 				<el-form-item label="店铺地址" prop="address">
 					<el-input v-model="ruleForm.address"></el-input>
@@ -148,6 +154,7 @@
 								mapSaver.set('name',app.ruleForm.name);
 								mapSaver.set('type',app.ruleForm.type);
 								mapSaver.set('cardName',app.ruleForm.cardName);
+								mapSaver.set('tel',app.ruleForm.tel);
 								mapSaver.set('address',app.ruleForm.address);
 								mapSaver.set('logo',app.ruleForm.logo);
 								mapSaver.set('activeName',"jiaohang");
@@ -194,6 +201,7 @@
 					temp.cardName = item.get('cardName');
 					temp.createdAt = item.get('createdAt').Format('yyyy-MM-dd hh:mm:ss');
 					temp.address = item.get('address');
+					temp.tel = item.get('tel');
 					temp.id = item.id;
 					tempArr.push(temp);
 				});
