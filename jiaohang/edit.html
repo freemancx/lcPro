@@ -140,7 +140,7 @@
 								curObj.set('address',app.ruleForm.address);
 								curObj.set('logo',app.ruleForm.logo);
 								curObj.save().then(function (todo) {
-								    app.$message({message:response.data.ermsg,type: 'success'});
+								    app.$message({message:'成功',type: 'success'});
 						    		setTimeout(() => { history.back(-1); }, 1000);
 								}, function (error) {
 								    console.error(error);
