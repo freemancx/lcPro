@@ -14,49 +14,7 @@
 
 	<body>
 		<div id="app">
-			<el-table :data="tableData" border style="width: 100%">
-
-				<el-table-column prop="name" label="店名" width="180">
-				</el-table-column>
-				
-				<el-table-column prop="logo" label="Logo" width="120">
-					<template scope="scope">
-						<img :src="scope.row.logo"/>
-					</template>
-				</el-table-column>
-				
-				<el-table-column prop="type" label="类别" width="80">
-				</el-table-column>
-
-				<el-table-column prop="cardName" label="券名" width="180">
-				</el-table-column>
-
-				<el-table-column prop="point" label="坐标" width="180">
-				</el-table-column>
-				
-				<el-table-column prop="tel" label="电话">
-				</el-table-column>
-				
-				<el-table-column prop="address" label="地址">
-				</el-table-column>
-
-				<el-table-column prop="createdAt" label="日期" width="180">
-				</el-table-column>
-				
-				<el-table-column label="操作" width="140">
-					<template scope="scope">
-						<a :href="'edit.html?id='+scope.row.id">
-							<el-button type="text" size="small">修改</el-button>
-						</a>
-						<el-button @click="handleDelete(scope.$index)" type="text" size="small">删除</el-button>
-					</template>
-				</el-table-column>
-				
-			</el-table>
-
-			<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="pageSize" layout="prev, pager, next, jumper" :total="total">
-			</el-pagination>
-
+			
 			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 420px;">
 				<el-form-item label="店铺名称" prop="name">
 					<el-input v-model="ruleForm.name"></el-input>
@@ -99,7 +57,7 @@
 				</el-form-item>
 				
 				<el-form-item label-width="100px">
-					<el-button type="primary" @click="submitForm('ruleForm')" :loading="btnLoading">立即创建</el-button>
+					<el-button type="primary" @click="submitForm('ruleForm')" :loading="btnLoading">保存</el-button>
 					<el-button @click="resetForm('ruleForm')">重置</el-button>
 				</el-form-item>
 				
@@ -110,9 +68,30 @@
 		</div>
 
 		<script>
+			//将url中的参数转换成json格式
+			function urlToJson(){	//默认参数为当前链接
+				var url = arguments[0] || window.location.href;
+				if( url.indexOf('?')<0 ){
+					return false;		//不存在参数返回false
+				}else{
+					var paraString = url.substring(url.indexOf('?') + 1,url.length);
+					var paraJsonString;
+					paraJsonString = paraString.replace(/\=/g,"\"\:\"");
+					paraJsonString = paraJsonString.replace(/\&/g,"\",\"");
+					paraJsonString = paraJsonString.replace(/\+/g," ");
+					paraJsonString = paraJsonString.replace(/\%26/g,"&");
+					paraJsonString = paraJsonString.replace(/\%2F/g,"\/");
+					paraJsonString = paraJsonString.replace(/\%0A/g,"\:");
+					paraJsonString = '{"' + paraJsonString + '"}';
+				    return JSON.parse(paraJsonString);
+				}
+			}
+			var urlData = urlToJson();
+			
 			var MapSaver = AV.Object.extend('Map');
 			var mapSaver = new MapSaver();
-			
+			var query = new AV.Query('Map');
+			var curObj;
 			var app = new Vue({
 				preview: '',
 				el: '#app',
@@ -153,25 +132,16 @@
 						this.$refs[formName].validate((valid) => {
 							if(valid) {
 								app.btnLoading = true;
-								mapSaver.set('point',app.ruleForm.point);
-								mapSaver.set('name',app.ruleForm.name);
-								mapSaver.set('type',app.ruleForm.type);
-								mapSaver.set('cardName',app.ruleForm.cardName);
-								mapSaver.set('tel',app.ruleForm.tel);
-								mapSaver.set('address',app.ruleForm.address);
-								mapSaver.set('logo',app.ruleForm.logo);
-								mapSaver.set('activeName',"jiaohang");
-								mapSaver.save().then(function (todo) {
-								    app.ruleForm.createdAt = "刚才";
-								    app.ruleForm.id = todo.id;
-								    setTimeout(() => {
-								    	var tempObj = deepCopy(app.ruleForm);
-								    	//拷贝对象
-								    	app.tableData.push(tempObj);
-									    app.$message({message:"成功",type: 'success'});
-									    app.btnLoading = false;
-								    	app.$refs[formName].resetFields();
-								    }, 800);
+								curObj.set('point',app.ruleForm.point);
+								curObj.set('name',app.ruleForm.name);
+								curObj.set('type',app.ruleForm.type);
+								curObj.set('cardName',app.ruleForm.cardName);
+								curObj.set('tel',app.ruleForm.tel);
+								curObj.set('address',app.ruleForm.address);
+								curObj.set('logo',app.ruleForm.logo);
+								curObj.save().then(function (todo) {
+								    app.$message({message:response.data.ermsg,type: 'success'});
+						    		setTimeout(() => { history.back(-1); }, 1000);
 								}, function (error) {
 								    console.error(error);
 								});
@@ -186,16 +156,10 @@
 					}
 				},
 			});
-			var query = new AV.Query('Map');
-			query.equalTo('activeName', 'jiaohang');
-			//总量
-			query.count().then(function(count) {
-				app.total = count;
-			}, function(error) {});
-
-			query.find().then(function(results) {
-				var tempArr = new Array();
-				results.forEach(function(item) {
+			
+			
+			query.get(urlData.id).then(function(item) {
+					curObj = item;
 					var temp = new Object();
 					temp.point = item.get('point');
 					temp.name = item.get('name');
@@ -206,9 +170,7 @@
 					temp.address = item.get('address');
 					temp.tel = item.get('tel');
 					temp.id = item.id;
-					tempArr.push(temp);
-				});
-				app.tableData = tempArr;
+					app.ruleForm = temp;
 			}, function(error) {});
 			
 			var fileUploadControl = document.getElementById("up-load");
