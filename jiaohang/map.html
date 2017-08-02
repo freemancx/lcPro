@@ -39,6 +39,9 @@
 				
 				<el-table-column prop="address" label="地址">
 				</el-table-column>
+				
+				<el-table-column prop="content" label="店铺详情">
+				</el-table-column>
 
 				<el-table-column prop="createdAt" label="日期" width="180">
 				</el-table-column>
@@ -54,8 +57,8 @@
 				
 			</el-table>
 
-			<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="pageSize" layout="prev, pager, next, jumper" :total="total">
-			</el-pagination>
+			<!--<el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page.sync="currentPage" :page-size="pageSize" layout="prev, pager, next, jumper" :total="total">
+			</el-pagination>-->
 
 			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm" style="width: 420px;">
 				<el-form-item label="店铺名称" prop="name">
@@ -87,6 +90,7 @@
 					<el-input v-model="ruleForm.address"></el-input>
 				</el-form-item>
 				
+				
 				<el-form-item label="店铺Logo" prop="logo">
 					<el-input v-model="ruleForm.logo" readonly></el-input>
 					
@@ -96,6 +100,10 @@
 					
 					<img :src="ruleForm.logo" width="120"/>
 					
+				</el-form-item>
+				
+				<el-form-item label="店铺描述" prop="content">
+					<el-input v-model="ruleForm.content" type="textarea"></el-input>
 				</el-form-item>
 				
 				<el-form-item label-width="100px">
@@ -129,6 +137,7 @@
 						cardName: '',
 						address: '',
 						logo: '',
+						content: '',
 					},
 				},
 				methods: {
@@ -160,6 +169,7 @@
 								mapSaver.set('tel',app.ruleForm.tel);
 								mapSaver.set('address',app.ruleForm.address);
 								mapSaver.set('logo',app.ruleForm.logo);
+								mapSaver.set('content',app.ruleForm.content);
 								mapSaver.set('activeName',"jiaohang");
 								mapSaver.save().then(function (todo) {
 								    app.ruleForm.createdAt = "刚才";
@@ -189,9 +199,9 @@
 			var query = new AV.Query('Map');
 			query.equalTo('activeName', 'jiaohang');
 			//总量
-			query.count().then(function(count) {
-				app.total = count;
-			}, function(error) {});
+//			query.count().then(function(count) {
+//				app.total = count;
+//			}, function(error) {});
 
 			query.find().then(function(results) {
 				var tempArr = new Array();
@@ -201,6 +211,7 @@
 					temp.name = item.get('name');
 					temp.type = item.get('type');
 					temp.logo = item.get('logo');
+					temp.content = item.get('content');
 					temp.cardName = item.get('cardName');
 					temp.createdAt = item.get('createdAt').Format('yyyy-MM-dd hh:mm:ss');
 					temp.address = item.get('address');
