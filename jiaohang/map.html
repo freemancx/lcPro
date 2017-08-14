@@ -197,6 +197,7 @@
 				},
 			});
 			var query = new AV.Query('Map');
+			query.limit(300);
 			query.equalTo('activeName', 'jiaohang');
 			//总量
 //			query.count().then(function(count) {
